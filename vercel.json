@@ -3,10 +3,11 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
+  "outputDirectory": "public/build",
   "rewrites": [
     {
       "source": "/:path*",
-      "destination": "/"
+      "destination": "/index.html"
     }
   ]
 }
