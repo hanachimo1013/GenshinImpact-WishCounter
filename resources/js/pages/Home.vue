@@ -97,14 +97,12 @@ export default {
     }
   },
   methods: {
-    async searchWindow() {
-      if (this.searchId) {
-        this.isSearching = true
-        // Simulate search delay
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        this.$router.push(`/window/${this.searchId}`)
-        this.isSearching = false
-      }
+    searchWindow() {
+      if (!this.searchId.trim()) return
+      
+      this.isSearching = true
+      this.$router.push(`/window/${this.searchId}`)
+      this.isSearching = false
     }
   }
 }
