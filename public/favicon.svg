@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#1e1b4b" rx="40"/>
+  
+  <!-- Outer glow circle -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#a78bfa" stroke-width="3" opacity="0.5"/>
+  
+  <!-- Star shape - 5 pointed star -->
+  <g transform="translate(100, 100)">
+    <!-- Gold star -->
+    <path d="M 0,-50 L 12,-18 L 45,-15 L 22,8 L 30,40 L 0,18 L -30,40 L -22,8 L -45,-15 L -12,-18 Z" fill="#f6b93b" stroke="#fcd34d" stroke-width="2"/>
+    
+    <!-- Inner shimmer -->
+    <circle cx="-10" cy="-15" r="8" fill="#fef3c7" opacity="0.7"/>
+    <circle cx="15" cy="20" r="5" fill="#fef3c7" opacity="0.6"/>
+    <circle cx="-5" cy="30" r="4" fill="#fef3c7" opacity="0.5"/>
+  </g>
+  
+  <!-- Accent circles -->
+  <circle cx="50" cy="50" r="8" fill="#667eea" opacity="0.6"/>
+  <circle cx="150" cy="150" r="6" fill="#f5576c" opacity="0.6"/>
+  <circle cx="150" cy="50" r="5" fill="#00f2fe" opacity="0.5"/>
+</svg>
