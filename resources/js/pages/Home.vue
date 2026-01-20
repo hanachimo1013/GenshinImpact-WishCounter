@@ -97,10 +97,12 @@ export default {
     }
   },
   methods: {
-    searchWindow() {
+    async searchWindow() {
       if (!this.searchId.trim()) return
       
       this.isSearching = true
+      // Show spinner for 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
       this.$router.push(`/window/${this.searchId}`)
       this.isSearching = false
     }
