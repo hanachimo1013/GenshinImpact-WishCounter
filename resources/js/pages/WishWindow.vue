@@ -1,7 +1,8 @@
 <template>
-  <div :class="`min-h-screen ${gradientClass}`">
+  <div :class="gradientClass">
+    <loading-spinner v-if="isLoadingStats" />
     <!-- Header -->
-    <div :class="`bg-black/40 backdrop-blur-md border-b border-${themeColor}-400/20 sticky top-0 z-10`">
+    <div :class="`bg-black/40 backdrop-blur-md border-b sticky top-0 z-10`" :style="{ borderColor: `${themeColorRGB}/20` }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between">
         <router-link to="/" class="text-2xl sm:text-3xl hover:text-white transition text-white">← Back</router-link>
         <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white hidden sm:block">{{ title }}</h1>
@@ -14,16 +15,16 @@
       <!-- Stats Grid - Responsive -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-6 sm:mb-12 lg:mb-16">
         <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 text-center rounded-xl">
-          <p :class="`text-${themeColor}-200 text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2`">Total Wishes</p>
+          <p class="text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2" :style="{ color: themeColorLight }">Total Wishes</p>
           <p class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{{ totalWishes }}</p>
         </div>
         <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 text-center rounded-xl">
-          <p :class="`text-${themeColor}-200 text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2`">5-Star Pulls</p>
+          <p class="text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2" :style="{ color: themeColorLight }">5-Star Pulls</p>
           <p class="text-3xl sm:text-4xl lg:text-5xl font-bold text-yellow-300">{{ fiveStarPulls }}</p>
         </div>
         <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 text-center rounded-xl">
-          <p :class="`text-${themeColor}-200 text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2`">Pity Counter</p>
-          <p :class="`text-3xl sm:text-4xl lg:text-5xl font-bold text-${pityColor}-300`">{{ pityCounter }}</p>
+          <p class="text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2" :style="{ color: themeColorLight }">Pity Counter</p>
+          <p class="text-3xl sm:text-4xl lg:text-5xl font-bold" :style="{ color: pityColorBright }">{{ pityCounter }}</p>
         </div>
       </div>
 
@@ -38,7 +39,11 @@
             min="3" 
             max="5"
             @keyup.enter="addWish"
-            :class="`flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-${themeColor}-950/50 border border-${themeColor}-400/30 rounded-lg text-white placeholder-${themeColor}-300 focus:outline-none focus:border-${themeColor}-300 transition`"
+            class="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg text-white focus:outline-none transition"
+            :style="{ 
+              backgroundColor: themeColorRGB ? `rgb(${themeColorRGB})/10` : 'rgb(192, 132, 250)/10',
+              borderColor: themeColorRGB ? `rgb(${themeColorRGB})/30` : 'rgb(192, 132, 250)/30'
+            }"
           />
           <button 
             @click="addWish"
@@ -55,7 +60,7 @@
       <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 rounded-xl">
         <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 sm:mb-6">📜 Recent Wishes</h2>
         <div v-if="wishes.length === 0" class="text-center py-8 sm:py-12">
-          <p :class="`text-${themeColor}-300 text-sm sm:text-base lg:text-lg`">No wishes yet. Start tracking! ✨</p>
+          <p class="text-sm sm:text-base lg:text-lg" :style="{ color: themeColorMuted }">No wishes yet. Start tracking! ✨</p>
         </div>
         <div v-else class="space-y-2 sm:space-y-3">
           <div 
@@ -75,7 +80,7 @@
                 <span v-else>🟨</span>
                 {{ wish.rarity }}-Star
               </span>
-              <span :class="`text-${themeColor}-300 text-xs sm:text-sm`">{{ formatDate(wish.timestamp) }}</span>
+              <span class="text-xs sm:text-sm" :style="{ color: themeColorMuted }}>{{ formatDate(wish.timestamp) }}</span>
             </div>
           </div>
         </div>
@@ -86,33 +91,22 @@
 
 <script>
 import { wishService } from '../services/supabase'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
+
+const colorMap = {
+  purple: { light: '#e9d5ff', muted: '#d8b4fe', rgb: '192, 132, 250', bright: '#d8b4fe' },
+  pink: { light: '#fbcfe8', muted: '#f472b6', rgb: '236, 72, 153', bright: '#f472b6' },
+  cyan: { light: '#a5f3fc', muted: '#67e8f9', rgb: '34, 211, 238', bright: '#67e8f9' }
+}
 
 export default {
   props: {
-    windowId: {
-      type: Number,
-      required: true
-    },
-    title: {
-      type: String,
-      required: true
-    },
-    themeColor: {
-      type: String,
-      default: 'purple'
-    },
-    pityColor: {
-      type: String,
-      default: 'purple'
-    },
-    buttonGradient: {
-      type: String,
-      default: 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'
-    },
-    gradientClass: {
-      type: String,
-      default: 'gradient-purple'
-    }
+    windowId: { type: Number, required: true },
+    title: { type: String, required: true },
+    themeColor: { type: String, default: 'purple' },
+    pityColor: { type: String, default: 'purple' },
+    buttonGradient: { type: String, default: 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' },
+    gradientClass: { type: String, default: 'gradient-purple min-h-screen' }
   },
   data() {
     return {
@@ -120,10 +114,23 @@ export default {
       rarity: 4,
       pityCounter: 0,
       isLoading: false,
+      isLoadingStats: false,
       error: null
     }
   },
   computed: {
+    themeColorLight() {
+      return colorMap[this.themeColor]?.light || colorMap.purple.light
+    },
+    themeColorMuted() {
+      return colorMap[this.themeColor]?.muted || colorMap.purple.muted
+    },
+    themeColorRGB() {
+      return colorMap[this.themeColor]?.rgb || colorMap.purple.rgb
+    },
+    pityColorBright() {
+      return colorMap[this.pityColor]?.bright || colorMap.purple.bright
+    },
     totalWishes() {
       return this.wishes.length
     },
@@ -157,6 +164,7 @@ export default {
     },
     async loadWishes() {
       this.error = null
+      this.isLoadingStats = true
       const { data, error } = await wishService.getWishes(this.windowId)
       if (error) {
         this.error = error.message || 'Failed to load wishes'
@@ -165,6 +173,7 @@ export default {
         const lastFiveStar = data.findIndex(w => w.rarity === 5)
         this.pityCounter = lastFiveStar >= 0 ? lastFiveStar : data.length
       }
+      this.isLoadingStats = false
     }
   },
   mounted() {
