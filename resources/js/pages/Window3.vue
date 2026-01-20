@@ -1,42 +1,79 @@
 <template>
-  <div class="window">
-    <div class="window-header">
-      <router-link to="/" class="back-btn">← Back</router-link>
-      <h1>Window 3 - Weapon Event Wishes</h1>
+  <div class="min-h-screen gradient-cyan">
+    <!-- Header -->
+    <div class="bg-black/40 backdrop-blur-md border-b border-cyan-400/20 sticky top-0 z-10">
+      <div class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+        <router-link to="/" class="text-3xl hover:text-cyan-200 transition text-white">← Back</router-link>
+        <h1 class="text-3xl font-bold text-white">⚔️ Weapon Event Wishes</h1>
+        <div class="w-12"></div>
+      </div>
     </div>
-    
-    <div class="window-content">
-      <div class="stats">
-        <div class="stat-card">
-          <h3>Total Wishes</h3>
-          <p class="stat-value">{{ totalWishes }}</p>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-6 py-12">
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-8 text-center rounded-xl">
+          <p class="text-cyan-200 text-lg mb-2">Total Wishes</p>
+          <p class="text-5xl font-bold text-white">{{ totalWishes }}</p>
         </div>
-        <div class="stat-card">
-          <h3>5-Star Pulls</h3>
-          <p class="stat-value">{{ fiveStarPulls }}</p>
+        <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-8 text-center rounded-xl">
+          <p class="text-cyan-200 text-lg mb-2">5-Star Pulls</p>
+          <p class="text-5xl font-bold text-yellow-300">{{ fiveStarPulls }}</p>
         </div>
-        <div class="stat-card">
-          <h3>Pity Counter</h3>
-          <p class="stat-value">{{ pityCounter }}</p>
+        <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-8 text-center rounded-xl">
+          <p class="text-cyan-200 text-lg mb-2">Pity Counter</p>
+          <p class="text-5xl font-bold text-cyan-300">{{ pityCounter }}</p>
         </div>
       </div>
 
-      <div class="add-wish">
-        <h2>Add a Wish</h2>
-        <div class="input-group">
-          <input v-model="rarity" type="number" placeholder="Rarity (3-5)" min="3" max="5" />
-          <button @click="addWish">Add Wish</button>
+      <!-- Add Wish Card -->
+      <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-xl mb-12">
+        <h2 class="text-2xl font-bold text-white mb-6">➕ Add a Wish</h2>
+        <div class="flex gap-4">
+          <input 
+            v-model="rarity" 
+            type="number" 
+            placeholder="Rarity (3-5)" 
+            min="3" 
+            max="5"
+            class="flex-1 px-4 py-3 bg-cyan-950/50 border border-cyan-400/30 rounded-lg text-white placeholder-cyan-300 focus:outline-none focus:border-cyan-300 transition"
+          />
+          <button 
+            @click="addWish"
+            class="btn-primary px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+          >
+            Add
+          </button>
         </div>
       </div>
 
-      <div class="recent-wishes">
-        <h2>Recent Wishes</h2>
-        <div v-if="wishes.length === 0" class="empty-state">
-          No wishes yet
+      <!-- Recent Wishes -->
+      <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-xl">
+        <h2 class="text-2xl font-bold text-white mb-6">📜 Recent Wishes</h2>
+        <div v-if="wishes.length === 0" class="text-center py-12">
+          <p class="text-cyan-300 text-lg">No wishes yet. Start tracking! ✨</p>
         </div>
-        <div v-else class="wishes-list">
-          <div v-for="(wish, idx) in wishes.slice(-10)" :key="idx" class="wish-item" :class="'rarity-' + wish.rarity">
-            {{ wish.rarity }}-Star • {{ wish.timestamp }}
+        <div v-else class="space-y-3">
+          <div 
+            v-for="(wish, idx) in wishes.slice().reverse().slice(0, 15)" 
+            :key="idx" 
+            class="p-4 bg-white/5 border-l-4 rounded-lg transition hover:bg-white/10"
+            :class="{
+              'border-blue-500': wish.rarity === 3,
+              'border-purple-500': wish.rarity === 4,
+              'border-yellow-500': wish.rarity === 5,
+            }"
+          >
+            <div class="flex justify-between items-center">
+              <span class="text-white font-semibold">
+                <span v-if="wish.rarity === 3">🟦</span>
+                <span v-else-if="wish.rarity === 4">🟪</span>
+                <span v-else>🟨</span>
+                {{ wish.rarity }}-Star
+              </span>
+              <span class="text-cyan-300 text-sm">{{ wish.timestamp }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -75,144 +112,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.window {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  padding: 2rem;
-}
-
-.window-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: white;
-  margin-bottom: 2rem;
-}
-
-.back-btn {
-  color: white;
-  text-decoration: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.back-btn:hover {
-  opacity: 0.8;
-}
-
-.window-content {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 1.5rem;
-  border-radius: 8px;
-  color: white;
-  text-align: center;
-}
-
-.stat-card h3 {
-  margin: 0 0 0.5rem 0;
-  opacity: 0.9;
-}
-
-.stat-value {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-.add-wish {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-}
-
-.add-wish h2 {
-  margin-top: 0;
-  color: #00f2fe;
-}
-
-.input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.input-group input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.input-group button {
-  padding: 0.75rem 1.5rem;
-  background-color: #00f2fe;
-  color: #333;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.input-group button:hover {
-  background-color: #00e1f5;
-}
-
-.recent-wishes {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-}
-
-.recent-wishes h2 {
-  margin-top: 0;
-  color: #00f2fe;
-}
-
-.empty-state {
-  text-align: center;
-  color: #999;
-  padding: 2rem;
-}
-
-.wishes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.wish-item {
-  padding: 1rem;
-  border-radius: 4px;
-  background-color: #f5f5f5;
-}
-
-.wish-item.rarity-3 {
-  border-left: 4px solid #89a5ab;
-}
-
-.wish-item.rarity-4 {
-  border-left: 4px solid #b19cd9;
-}
-
-.wish-item.rarity-5 {
-  border-left: 4px solid #f6b93b;
-  font-weight: bold;
-}
-</style>
