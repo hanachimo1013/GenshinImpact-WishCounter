@@ -41,33 +41,33 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <!-- Window 1 -->
           <router-link 
-            to="/window1" 
+            to="/window/1" 
             class="card group bg-black/40 backdrop-blur-xl border border-purple-500/20 hover:border-purple-400/40 p-6 sm:p-8 lg:p-10 cursor-pointer transform hover:scale-105 transition-all"
           >
             <div class="mb-4 text-5xl sm:text-6xl lg:text-7xl">⭐</div>
-            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-purple-300 transition">Standard Wishes</h3>
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-purple-300 transition">Character Event Wish</h3>
             <p class="text-sm sm:text-base text-purple-200 mb-4">Window 1</p>
             <div class="h-1 w-full bg-gradient-to-r from-purple-600 to-transparent rounded group-hover:from-purple-400 transition"></div>
           </router-link>
 
           <!-- Window 2 -->
           <router-link 
-            to="/window2" 
+            to="/window/2" 
             class="card group bg-black/40 backdrop-blur-xl border border-pink-500/20 hover:border-pink-400/40 p-6 sm:p-8 lg:p-10 cursor-pointer transform hover:scale-105 transition-all"
           >
             <div class="mb-4 text-5xl sm:text-6xl lg:text-7xl">👤</div>
-            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-pink-300 transition">Character Events</h3>
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-pink-300 transition">Weapon Event Wish</h3>
             <p class="text-sm sm:text-base text-pink-200 mb-4">Window 2</p>
             <div class="h-1 w-full bg-gradient-to-r from-pink-600 to-transparent rounded group-hover:from-pink-400 transition"></div>
           </router-link>
 
           <!-- Window 3 -->
           <router-link 
-            to="/window3" 
+            to="/window/3" 
             class="card group bg-black/40 backdrop-blur-xl border border-cyan-500/20 hover:border-cyan-400/40 p-6 sm:p-8 lg:p-10 cursor-pointer transform hover:scale-105 transition-all md:col-span-2 lg:col-span-1"
           >
             <div class="mb-4 text-5xl sm:text-6xl lg:text-7xl">⚔️</div>
-            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-cyan-300 transition">Weapon Events</h3>
+            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-cyan-300 transition">Standard Wish</h3>
             <p class="text-sm sm:text-base text-cyan-200 mb-4">Window 3</p>
             <div class="h-1 w-full bg-gradient-to-r from-cyan-600 to-transparent rounded group-hover:from-cyan-400 transition"></div>
           </router-link>

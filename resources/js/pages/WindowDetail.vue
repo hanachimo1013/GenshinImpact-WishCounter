@@ -1,62 +1,216 @@
 <template>
-  <div class="window">
-    <div class="window-header">
-      <router-link to="/" class="back-btn">← Back</router-link>
-      <h1>Search Result: {{ id }}</h1>
-    </div>
-    
-    <div class="window-content">
-      <div class="search-result">
-        <h2>Window ID: {{ id }}</h2>
-        <p>Details for the searched window ID will appear here.</p>
+  <div :class="gradientClass">
+    <loading-spinner v-if="isLoadingStats" />
+    <div v-else>
+      <!-- Header -->
+      <div :class="`bg-black/40 backdrop-blur-md border-b sticky top-0 z-10`" :style="{ borderColor: `${themeColorRGB}/20` }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between">
+          <router-link to="/" class="text-2xl sm:text-3xl hover:text-white transition text-white">← Back</router-link>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white hidden sm:block">{{ title }}</h1>
+          <div class="w-8 sm:w-12"></div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 lg:py-16">
+        <!-- Stats Grid - Responsive -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-6 sm:mb-12 lg:mb-16">
+          <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 text-center rounded-xl">
+            <p class="text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2" :style="{ color: themeColorLight }">Total Wishes</p>
+            <p class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{{ totalWishes }}</p>
+          </div>
+          <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 text-center rounded-xl">
+            <p class="text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2" :style="{ color: themeColorLight }">5-Star Pulls</p>
+            <p class="text-3xl sm:text-4xl lg:text-5xl font-bold text-yellow-300">{{ fiveStarPulls }}</p>
+          </div>
+          <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 text-center rounded-xl">
+            <p class="text-xs sm:text-sm lg:text-lg mb-1 sm:mb-2" :style="{ color: themeColorLight }">Pity Counter</p>
+            <p class="text-3xl sm:text-4xl lg:text-5xl font-bold" :style="{ color: pityColorBright }">{{ pityCounter }}</p>
+          </div>
+        </div>
+
+        <!-- Add Wish Card -->
+        <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 rounded-xl mb-6 sm:mb-12 lg:mb-16">
+          <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-3 sm:mb-6">➕ Add a Wish</h2>
+          <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <input 
+              v-model.number="rarity" 
+              type="number" 
+              placeholder="Rarity (3-5)" 
+              min="3" 
+              max="5"
+              @keyup.enter="addWish"
+              class="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg text-white focus:outline-none transition"
+              :style="{ 
+                backgroundColor: themeColorRGB ? `rgb(${themeColorRGB})/10` : 'rgb(192, 132, 250)/10',
+                borderColor: themeColorRGB ? `rgb(${themeColorRGB})/30` : 'rgb(192, 132, 250)/30'
+              }"
+            />
+            <button 
+              @click="addWish"
+              :class="`btn-primary px-4 sm:px-8 py-2 sm:py-3 text-sm sm:text-base ${buttonGradient} whitespace-nowrap`"
+              :disabled="isLoading"
+            >
+              {{ isLoading ? 'Adding...' : 'Add' }}
+            </button>
+          </div>
+          <p v-if="error" class="text-red-400 text-sm mt-2">{{ error }}</p>
+        </div>
+
+        <!-- Recent Wishes -->
+        <div class="card bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-6 lg:p-8 rounded-xl">
+          <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-4 sm:mb-6">📜 Recent Wishes</h2>
+          <div v-if="wishes.length === 0" class="text-center py-8 sm:py-12">
+            <p class="text-sm sm:text-base lg:text-lg" :style="{ color: themeColorMuted }">No wishes yet. Start tracking! ✨</p>
+          </div>
+          <div v-else class="space-y-2 sm:space-y-3">
+            <div 
+              v-for="(wish, idx) in wishes.slice().reverse().slice(0, 15)" 
+              :key="idx" 
+              class="p-3 sm:p-4 bg-white/5 border-l-4 rounded-lg transition hover:bg-white/10"
+              :class="{
+                'border-blue-500': wish.rarity === 3,
+                'border-purple-500': wish.rarity === 4,
+                'border-yellow-500': wish.rarity === 5,
+              }"
+            >
+              <div class="flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-0">
+                <span class="text-white font-semibold text-sm sm:text-base">
+                  <span v-if="wish.rarity === 3">🟦</span>
+                  <span v-else-if="wish.rarity === 4">🟪</span>
+                  <span v-else>🟨</span>
+                  {{ wish.rarity }}-Star
+                </span>
+                <span class="text-xs sm:text-sm" :style="{ color: themeColorMuted }">{{ formatDate(wish.timestamp) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { wishService } from '../services/supabase'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
+
+const colorMap = {
+  purple: { light: '#e9d5ff', muted: '#d8b4fe', rgb: '192, 132, 250', bright: '#d8b4fe' },
+  pink: { light: '#fbcfe8', muted: '#f472b6', rgb: '236, 72, 153', bright: '#f472b6' },
+  cyan: { light: '#a5f3fc', muted: '#67e8f9', rgb: '34, 211, 238', bright: '#67e8f9' }
+}
+
+const windowConfig = {
+  1: {
+    title: 'Character Event Wish',
+    themeColor: 'purple',
+    pityColor: 'purple',
+    buttonGradient: 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600',
+    gradientClass: 'gradient-purple min-h-screen'
+  },
+  2: {
+    title: 'Weapon Event Wish',
+    themeColor: 'cyan',
+    pityColor: 'pink',
+    buttonGradient: 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
+    gradientClass: 'gradient-cyan min-h-screen'
+  },
+  3: {
+    title: 'Standard Wish',
+    themeColor: 'pink',
+    pityColor: 'cyan',
+    buttonGradient: 'bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600',
+    gradientClass: 'gradient-pink min-h-screen'
+  }
+}
+
 export default {
-  name: 'WindowDetail',
-  props: ['id']
+  props: {
+    id: { type: String, required: true }
+  },
+  data() {
+    const config = windowConfig[this.id] || windowConfig[1]
+    return {
+      wishes: [],
+      rarity: 4,
+      pityCounter: 0,
+      isLoading: false,
+      isLoadingStats: false,
+      error: null,
+      ...config
+    }
+  },
+  computed: {
+    themeColorLight() {
+      return colorMap[this.themeColor]?.light || colorMap.purple.light
+    },
+    themeColorMuted() {
+      return colorMap[this.themeColor]?.muted || colorMap.purple.muted
+    },
+    themeColorRGB() {
+      return colorMap[this.themeColor]?.rgb || colorMap.purple.rgb
+    },
+    pityColorBright() {
+      return colorMap[this.pityColor]?.bright || colorMap.purple.bright
+    },
+    totalWishes() {
+      return this.wishes.length
+    },
+    fiveStarPulls() {
+      return this.wishes.filter(w => w.rarity === 5).length
+    },
+    windowId() {
+      return parseInt(this.id, 10)
+    }
+  },
+  methods: {
+    formatDate(timestamp) {
+      if (!timestamp) return ''
+      return new Date(timestamp).toLocaleString()
+    },
+    async addWish() {
+      if (!this.rarity || this.rarity < 3 || this.rarity > 5) {
+        this.error = 'Rarity must be between 3 and 5'
+        return
+      }
+
+      this.isLoading = true
+      this.error = null
+
+      const { data, error } = await wishService.addWish(this.windowId, this.rarity)
+      if (error) {
+        this.error = error.message || 'Failed to add wish'
+      } else if (data && data.length > 0) {
+        this.wishes.unshift(data[0])
+        this.pityCounter = this.rarity === 5 ? 0 : this.pityCounter + 1
+        this.rarity = 4
+      }
+      this.isLoading = false
+    },
+    async loadWishes() {
+      this.error = null
+      this.isLoadingStats = true
+      const { data, error } = await wishService.getWishes(this.windowId)
+      if (error) {
+        this.error = error.message || 'Failed to load wishes'
+      } else if (data && data.length > 0) {
+        this.wishes = data
+        const lastFiveStar = data.findIndex(w => w.rarity === 5)
+        this.pityCounter = lastFiveStar >= 0 ? lastFiveStar : data.length
+      }
+      this.isLoadingStats = false
+    }
+  },
+  mounted() {
+    this.loadWishes()
+  },
+  watch: {
+    id() {
+      const config = windowConfig[this.id] || windowConfig[1]
+      Object.assign(this, config)
+      this.loadWishes()
+    }
+  }
 }
 </script>
-
-<style scoped>
-.window {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  padding: 2rem;
-}
-
-.window-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: white;
-  margin-bottom: 2rem;
-}
-
-.back-btn {
-  color: white;
-  text-decoration: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.window-content {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.search-result {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.search-result h2 {
-  color: #fa709a;
-  margin-top: 0;
-}
-</style>
