@@ -82,13 +82,16 @@
 </template>
 
 <script>
+import { wishService } from '../services/supabase'
+
 export default {
   name: 'Window2',
   data() {
     return {
       wishes: [],
       rarity: 4,
-      pityCounter: 0
+      pityCounter: 0,
+      loading: true
     }
   },
   computed: {
@@ -100,15 +103,26 @@ export default {
     }
   },
   methods: {
-    addWish() {
-      const wish = {
-        rarity: parseInt(this.rarity),
-        timestamp: new Date().toLocaleString()
-      };
-      this.wishes.push(wish);
-      this.pityCounter = wish.rarity === 5 ? 0 : this.pityCounter + 1;
-      this.rarity = 4;
+    async addWish() {
+      const { data, error } = await wishService.addWish(2, parseInt(this.rarity))
+      if (!error && data) {
+        this.wishes.unshift(data[0])
+        this.pityCounter = parseInt(this.rarity) === 5 ? 0 : this.pityCounter + 1;
+        this.rarity = 4;
+      }
+    },
+    async loadWishes() {
+      this.loading = true
+      const { data, error } = await wishService.getWishes(2)
+      if (!error && data) {
+        this.wishes = data
+        this.pityCounter = data.length > 0 && data[0].rarity === 5 ? 0 : data.length
+      }
+      this.loading = false
     }
+  },
+  mounted() {
+    this.loadWishes()
   }
 }
 </script>
