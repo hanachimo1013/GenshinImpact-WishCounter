@@ -25,3 +25,57 @@
     @apply bg-gradient-to-br from-cyan-400 via-blue-400 to-cyan-600;
   }
 }
+
+@layer utilities {
+  .google-loader {
+    @apply flex items-center justify-center gap-2;
+  }
+
+  .google-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 9999px;
+    animation: google-dot-pulse 1.2s infinite ease-in-out;
+  }
+
+  .google-dot--blue {
+    background-color: #4285f4;
+  }
+
+  .google-dot--red {
+    background-color: #db4437;
+  }
+
+  .google-dot--yellow {
+    background-color: #f4b400;
+  }
+
+  .google-dot--green {
+    background-color: #0f9d58;
+  }
+
+  .google-dot-delay-1 {
+    animation-delay: 0.15s;
+  }
+
+  .google-dot-delay-2 {
+    animation-delay: 0.3s;
+  }
+
+  .google-dot-delay-3 {
+    animation-delay: 0.45s;
+  }
+}
+
+@keyframes google-dot-pulse {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
